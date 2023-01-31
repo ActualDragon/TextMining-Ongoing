@@ -23,14 +23,3 @@ for paragraph in doc.get_child_nodes(aw.NodeType.PARAGRAPH, True) :
 
 print(len(f))
 print(f[3:5])
-
-
-
-
-
-#name = r'C:/Users/danyg/Documents/Internado/TextMining/Pacientes/PACIENTE-2.doc'
-#out = pypandoc.convert_file(name, 'plain', outputfile=r"C:/Users/danyg/Documents/Internado/TextMining/Pacientes/PACIENTE-2.txt")
-#assert out == ""
-#text = txt.process(r"C:/Users/danyg/Documents/Internado/TextMining/Pacientes/PACIENTE-2.DOC", encoding="UTF-8")
-#text = text.decode("utf8")
-#text = textract.process("C:/Users/danyg/Documents/Internado/TextMining/Pacientes/PACIENTE-2.DOC", encoding = 'unicode_escape')
