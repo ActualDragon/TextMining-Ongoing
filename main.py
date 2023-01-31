@@ -10,6 +10,12 @@ from nltk.stem import PorterStemmer #stem es un sub-paquete de nltk que elimina 
                                     #el algoritmo porter stemmer hace el stemming
 import aspose.words as aw #nos permmite leer archivos .doc
 
+"""
+Importar librerias de python
+En terminal de VS Code:  py -m pip install libreria
+En terminal Python: import libreria
+                    print(libreria.__file__)
+"""
 #Variables globales
 f = []
 
