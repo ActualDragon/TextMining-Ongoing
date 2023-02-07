@@ -1,0 +1,46 @@
+html,
+body,
+.intro {
+  height: 100%;
+}
+
+.container {
+    background-color: #f3f2f2;
+}
+
+#file_title {
+    color: #92aad0;
+}
+
+#file_text {
+    color: #45526e;
+}
+
+#submit_file {
+    background-color: #92aad0;
+}
+
+@media (min-width: 550px) and (max-width: 750px) {
+  html,
+  body,
+  .intro {
+    height: 550px;
+  }
+}
+
+@media (min-width: 800px) and (max-width: 850px) {
+  html,
+  body,
+  .intro {
+    height: 550px;
+  }
+}
+
+a.link {
+  font-size: .875rem;
+  color: #6582B0;
+}
+a.link:hover, 
+a.link:active {
+  color: #426193;
+}
