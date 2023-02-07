@@ -4,8 +4,12 @@ body,
   height: 100%;
 }
 
+body {
+    background-color: #b2caef;
+}
+
 .container {
-    background-color: #f3f2f2;
+    background-color: #95aac8;
 }
 
 #file_title {
