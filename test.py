@@ -28,8 +28,9 @@ def Read_File(name):
         paragraph = paragraph.as_paragraph()
         f.append(paragraph.to_string(aw.SaveFormat.TEXT))
 
+    escaped = f.encode('unicode-escape').replace("'", "\\'") #reemplazar caracteres especiales
     #print(len(f))
-    return f
+    return escaped
 
 # _.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.
 
