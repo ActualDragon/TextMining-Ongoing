@@ -20,17 +20,23 @@ def validate_file(file):
 #Leer la copia local del archivo que se subió
 def Read_File(name):
     f = []
+    text = []
     basedir = os.path.abspath(os.path.dirname(__file__)) #Obtener el directorio actual
     path = "".join([basedir,"\\static\\uploads\\", name]) #Obtener el directorio del archivo temporal
     doc = aw.Document(path) # Cargar el archivo a leer
     # Leer el contenido de los parrafos tipo nodo
     for paragraph in doc.get_child_nodes(aw.NodeType.PARAGRAPH, True) :    
         paragraph = paragraph.as_paragraph()
-        f.append(paragraph.to_string(aw.SaveFormat.TEXT))
-
-    escaped = f.encode('unicode-escape').replace("'", "\\'") #reemplazar caracteres especiales
-    #print(len(f))
-    return escaped
+        p = paragraph.to_string(aw.SaveFormat.TEXT)
+        p = p.replace("\\", "/").replace('"','\\"').replace("'","\'") #Escapar caracteres especiales
+        p = p.replace('\n', '').replace('\r', '') #Eliminar saltos de linea y el retorno de carro
+        f.append(p)
+    #Eliminar el texto adicional que agrega la libreria aspose.words
+    size = len(f)
+    for x in range(1,size-2):
+        text.append(f[x])
+    
+    return text
 
 # _.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.
 
