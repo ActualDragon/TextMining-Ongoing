@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+
+    <!-- Font tags -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital@1&display=swap" rel="stylesheet">
+
+    <!--<script src="{{ url_for('static', filename='js/script.js') }}"></script>-->
+
+    <title>Indices</title>
+  </head>
+  <body>
+    <header>
+    </header>
+
+<div class="container-fluid">
+    <!-- Form Goldman -->
+    <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="card" style="border-radius: 1rem;">
+                <div class="row g-0">
+                    <div class="col-md-8 d-flex align-items-center">
+                        <div class="card-body py-5 px-4 p-md-5">
+                            <form action = "http://localhost:5000/index" method = "POST" enctype = "multipart/form-data">
+                                <h4 class="fw-bold mb-4" id = "file_title">Goldman</h4>
+                                <p class="mb-4" id = "file_text">Índice de Riesgo Cardíaco en Cirugía no Cardiaca</p>
+                                <label for="Goldman_edad" class="form-label">Edad</label>
+                                {% if Goldman.edad == 0 %}
+                                    <select class="form-select form-select-sm" id= "Goldman_edad">
+                                        <option selected>No encontre la edad, por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="5">Paciente tiene más de 70 años</option>
+                                        <option value="0">El paciente tiene 70 años o menos</option>
+                                    </select>
+                                {% else %}
+                                    <span id="Goldman_edad">{{ Goldman.edad }}</span>
+                                {% endif %} 
+
+                                <!-- Agregar un for que revise que si uno de los criterios no existe, genera el boton para enviarlos-->
+                                 <div class="d-flex justify-content-end pt-1 mb-4">
+                                 <button class="btn btn-primary btn-rounded" id = "submit_file" type="submit" >Enviar</button>
+                                 </div>
+                                 <hr>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Form Lee -->
+    <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="card" style="border-radius: 1rem;">
+                <div class="row g-0">
+                    <div class="col-md-8 d-flex align-items-center">
+                        <div class="card-body py-5 px-4 p-md-5">
+                            <form action = "http://localhost:5000/index" method = "POST" enctype = "multipart/form-data">
+                                <h4 class="fw-bold mb-4" id = "file_title">Puntaje de Lee</h4>
+                                <p class="mb-4" id = "file_text">Índice Revisado de Riesgo Cardíaco</p>
+                                
+                                 <div class="d-flex justify-content-end pt-1 mb-4">
+                                 <button class="btn btn-primary btn-rounded" id = "submit_file" type="submit">Enviar</button>
+                                 </div>
+                                 <hr>
+                              </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Detsky -->
+    <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="card" style="border-radius: 1rem;">
+                <div class="row g-0">
+                    <div class="col-md-8 d-flex align-items-center">
+                        <div class="card-body py-5 px-4 p-md-5">
+                            <form action = "http://localhost:5000/index" method = "POST" enctype = "multipart/form-data">
+                                <h4 class="fw-bold mb-4" id = "file_title">Índice de Detsky</h4>
+                                <p class="mb-4" id = "file_text">Índice Modificado de Riesgo Cardíaco de Detsky</p>
+                                <label for="Detsky_edad" class="form-label">Edad</label>
+                                {% if Detsky.edad == 0 %}
+                                    <select class="form-select form-select-sm" id= "Detsky_edad">
+                                        <option selected>No encontre la edad, por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="5">Paciente tiene más de 70 años</option>
+                                        <option value="0">El paciente tiene 70 años o menos</option>
+                                    </select>
+                                {% else %}
+                                    <span id="Detsky_edad">{{ Detsky.edad }}</span>
+                                {% endif %} 
+                                <div class="d-flex justify-content-end pt-1 mb-4">
+                                    <button class="btn btn-primary btn-rounded" id = "submit_file" type="submit" >Enviar</button>
+                                    </div>
+                                 <hr>
+                              </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Form Padua -->
+    <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="card" style="border-radius: 1rem;">
+                <div class="row g-0">
+                    <div class="col-md-8 d-flex align-items-center">
+                        <div class="card-body py-5 px-4 p-md-5">
+                            <form action = "http://localhost:5000/index" method = "POST" enctype = "multipart/form-data">
+                                <h4 class="fw-bold mb-4" id = "file_title">Puntaje Predictivo de Padua</h4>
+                                <label for="Padua_edad" class="form-label">Edad</label>
+                                {% if Padua.edad == 0 %}
+                                    <select class="form-select form-select-sm" id= "Padua_edad">
+                                        <option selected>No encontre la edad, por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="1">Paciente tiene más de 70 años</option>
+                                        <option value="0">El paciente tiene 70 años o menos</option>
+                                    </select>
+                                {% else %}
+                                    <span id="Padua_edad">{{ Padua.edad }}</span>
+                                {% endif %} 
+                                 <div class="d-flex justify-content-end pt-1 mb-4">
+                                 <button class="btn btn-primary btn-rounded" id = "submit_file" type="submit">Enviar</button>
+                                 </div>
+                                 <hr>
+                              </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    <footer class="panel-footer">
+    </footer>
+     
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+  </body>
+</html>

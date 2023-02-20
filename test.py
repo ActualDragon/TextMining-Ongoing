@@ -33,3 +33,21 @@ eng = syn[0].lemma_names('spa')
 print("Lemma names: ",eng,"\n")
 
 print("Definition: ",syn[0].definition())
+
+"""
+
+class Goldman:
+    def age(self, age):
+        self.age = age
+
+    def name(self,name):
+        self.name = name
+    
+    def __str__(self): 
+        return "Name: %s \n" \
+               "Age: %i" % (self.name, self.age)
+
+Dany = Goldman()
+Dany.age(5)
+Dany.name("Dany")
+print(Dany) """
