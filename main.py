@@ -9,175 +9,128 @@ from nltk.corpus import wordnet as wn
 
 #CLASES
 class Goldman_Index:
-    def edad(self, edad, edad_p): #Edad > 70
-        self.edad = edad #Valor encontrado
-        self.edad_p = edad_p #Puntaje asignado segun el indice
+    edad = 0 #Valor encontrado [Edad]
+    edad_p = -1 #Puntaje asignado segun el indice
 
-    def IAM(self, IAM, IAM_p): #Infarto agudo de miocardio
-        self.IAM = IAM
-        self.IAM_p = IAM_p
+    IAM = 0 #Infarto agudo de miocardio
+    IAM_p = -1
     
-    def JVD(self, JVD, JVD_p): #Distención de la vena yugular o ruido cardiaco en S3
-        self.JVD = JVD
-        self.JVD_p = JVD_p
+    JVD = 0 #Distención de la vena yugular o ruido cardiaco en S3
+    JVD_p = -1
 
-    def EA(self, EA, EA_p): #Estenosis aórtica
-        self.EA = EA
-        self.EA_p = EA_p
+    EA = 0 #Estenosis aórtica
+    EA_p = -1
 
-    def ECG(self, ECG, ECG_p): #Ritmo distinto al sinusal o CAP (contracciones auriculares prematuras) en su último ECG
-        self.ECG = ECG
-        self.ECG_p = ECG_p
+    ECG = 0 #Ritmo distinto al sinusal o CAP (contracciones auriculares prematuras) en su último ECG
+    ECG_p = -1
 
-    def CVP(self, CVP, CVP_p): #5 contracciones ventriculares prematuras / min documentadas en cualquier momento
-        self.CVP = CVP
-        self.CVP_p = CVP_p
+    CVP = 0 #5 contracciones ventriculares prematuras / min documentadas en cualquier momento
+    CVP_p = -1
 
     #PO2 (presión parcial de oxígeno) < 60 o PCO2 (presión parcial de dióxido de carbono) > 50 mm Hg, K (potasio) < 3.0 o HCO3 (bicarbonato) < 20 meq/litro,
     #BUN (nitrógeno ureico en sangre) > 50 o Cr (creatinina) > 3.0 mg/dl, SGOT (transaminasa glutámico-oxalacética) abnormal, 
     #señales de enfermedad hepática crónica o paciente postrado por causas no-cardíacas
-    def estado(self, estado, estado_p): 
-        self.estado = estado
-        self.estado_p = estado_p
+    estado = 0
+    estado_p = -1
 
-    def OR(self, OR, OR_p): #Cirugia intraperitoneal, intratorácica o aórtica
-        self.OR = OR
-        self.OR_p = OR_p
+    OR = 0 #Cirugia intraperitoneal, intratorácica o aórtica
+    OR_p = -1
 
-    def ER(self, ER, ER_p): #Cirugía de emergencia
-        self.ER = ER
-        self.ER_p = ER_p
+    ER = 0 #Cirugía de emergencia
+    ER_p = -1
     
     def __str__(self): 
         return "Edad: %s \n" \
                "Puntaje edad: %i \n" % (self.edad, self.edad_p)
 
 class Puntaje_Lee:
-    def OR(self, OR, OR_p): #Cirugia de alto riesgo (intraperitoneal, intratorácica o suprainguinal vascular)
-        self.OR = OR #Valor encontrado
-        self.OR_p = OR_p #Puntaje asignado segun el indice
+    OR = 0  #Cirugia de alto riesgo (intraperitoneal, intratorácica o suprainguinal vascular) [Valor encontrado]
+    OR_p = -1 #Puntaje asignado segun el indice
 
-    def isq(self, isq, isq_p): #Historial de enfermedad cardíaca isquémica
-        self.isq = isq
-        self.isq_p = isq_p
+    isq = 0 #Historial de enfermedad cardíaca isquémica
+    isq_p = -1
     
-    def cong(self, cong, cong_p): #Historial de enfermedad cardíaca congestiva
-        self.cong = cong
-        self.cong_p = cong_p
+    cong = 0 #Historial de enfermedad cardíaca congestiva
+    cong_p = -1
 
-    def CV(self, CV, CV_p): #Historial de enfermedaad cerebrovascular
-        self.CV = CV
-        self.CV_p = CV_p
+    CV = 0 #Historial de enfermedaad cerebrovascular
+    CV_p = -1
 
-    def diab(self, diab, diab_p): #Terapia de insulina para diabéticos
-        self.diab = diab
-        self.diab_p = diab_p
+    diab = 0 #Terapia de insulina para diabéticos
+    diab_p = -1
 
-    def Cr(self, Cr, Cr_p): #Creatinina preoperatoria > a 2 mg/dL (o > 177 micromol/L)
-        self.Cr = Cr
-        self.Cr_p = Cr_p
+    Cr = 0 #Creatinina preoperatoria > a 2 mg/dL (o > 177 micromol/L)
+    Cr_p = -1
 
 class Detsky_Index:
-    def IAM_new(self, IAM_new, IAM_new_p): #Infarto agudo de miocardio < 6 meses
-        self.IAM_new = IAM_new #Valor encontrado
-        self.IAM_new_p = IAM_new_p #Puntaje asignado segun el indice
-
-    def IAM_old(self, IAM_old, IAM_old_p): #Infarto agudo de miocardio > 6 meses
-        self.IAM_old = IAM_old
-        self.IAM_old_p = IAM_old_p
+    IAM = 0 #Valor encontrado Infarto agudo de miocardio < o > 6 meses
+    IAM_p = -1 #Puntaje asignado segun el indice
     
-    def ang_III(self, ang_III, ang_III_p): #Angina de pecho según la Sociedad Cardiovascular Canadiense -> Clase III
-        self.ang_III = ang_III
-        self.ang_III_p = ang_III_p
+    ang = 0 #Angina de pecho según la Sociedad Cardiovascular Canadiense -> Clase III o IV
+    ang_p = -1
 
-    def ang_IV(self, ang_IV, ang_IV_p): #Angina de pecho según la Sociedad Cardiovascular Canadiense -> Clase IV
-        self.ang_IV = ang_IV
-        self.ang_IV_p = ang_IV_p
+    angina = 0 #Angina inestable < 3 meses
+    angina_p = -1
 
-    def angina(self, angina, angina_p): #Angina inestable < 3 meses
-        self.angina = angina
-        self.angina_p = angina_p 
+    edema = 0 #Edema pulmonar < 1 semana o cualquier otro momento
+    edema_p = -1
 
-    def edema_new(self, edema_new, edema_new_p): #Edema pulmonar < 1 semana
-        self.edema_new = edema_new
-        self.edema_new_p = edema_new_p
-
-    def edema_old(self, edema_old, edema_old_p): #Edema pulmonar en cualquier otro momento
-        self.edema_old = edema_old
-        self.edema_old_p = edema_old_p
-
-    def EA(self, EA, EA_p): #Estenosis aórtica crítica
-        self.EA = EA
-        self.EA_p = EA_p
+    EA = 0 #Estenosis aórtica crítica
+    EA_p = -1
     
-    def ECG(self, ECG, ECG_p): #Ritmo distinto al sinusal o extrasístoles auriculares
-        self.ECG = ECG
-        self.ECG_p = ECG_p
+    ECG = 0 #Ritmo distinto al sinusal o extrasístoles auriculares
+    ECG_p = -1
 
-    def CAP(self, CAP, CAP_p): # >5 CAP (contracciones auriculares prematuras) / min documentados en cualquier momento
-        self.CAP = CAP
-        self.CAP_p = CAP_p
+    CAP = 0 # >5 CAP (contracciones auriculares prematuras) / min documentados en cualquier momento
+    CAP_p = -1
 
     #PO2 (presión parcial de oxígeno) < 60 o PCO2 (presión parcial de dióxido de carbono) > 50 mm Hg, K (potasio) < 3.0 o HCO3 (bicarbonato) < 20 meq/litro,
     #BUN (nitrógeno ureico en sangre) > 50 o Cr (creatinina) > 3.0 mg/dl, SGOT (transaminasa glutámico-oxalacética) abnormal, 
     #señales de enfermedad hepática crónica o paciente postrado por causas no-cardíacas
-    def estado(self, estado, estado_p): 
-        self.estado = estado
-        self.estado_p = estado_p
+    estado = 0
+    estado_p = -1
 
-    def edad(self, edad, edad_p): #Edad > 70
-        self.edad = edad 
-        self.edad_p = edad_p 
+    edad = 0  #Edad > 70
+    edad_p = -1
     
-    def ER(self, ER, ER_p): #Cirugía de emergencia
-        self.ER = ER
-        self.ER_p = ER_p
+    ER = 0 #Cirugía de emergencia
+    ER_p = -1
 
     def __str__(self): 
         return "Edad: %s \n" \
                "Puntaje edad: %i \n" % (self.edad, self.edad_p)
 
 class Puntaje_Padua:
-    def cancer(self, cancer, cancer_p): #Cancer activo -> metástasis y/o han pasado por quimioterapia o radioterapia en los últimos 6 meses
-        self.cancer = cancer #Valor encontrado
-        self.cancer_p = cancer_p #Puntaje asignado segun el indice
+    cancer = 0 #Valor encontrado Cancer activo -> metástasis y/o han pasado por quimioterapia o radioterapia en los últimos 6 meses
+    cancer_p = -1 #Puntaje asignado segun el indice
 
-    def TEV(self, TEV, TEV_p): #Tromboembolismo venoso (excluyendo trombosis venosa superficial)
-        self.TEV = TEV
-        self.TEV_p = TEV_p
+    TEV = 0 #Tromboembolismo venoso (excluyendo trombosis venosa superficial)
+    TEV_p = -1
     
-    def mov(self, mov, mov_p): #Movilidad reducida -> postrado con privilegios de baño (por incapacidad del paciente u órdenes del médico) por lo menos 3 días
-        self.mov = mov
-        self.mov_p = mov_p
+    mov = 0 #Movilidad reducida -> postrado con privilegios de baño (por incapacidad del paciente u órdenes del médico) por lo menos 3 días
+    mov_p = -1
 
     #Condición trombofília conocida (defectos de antitrombina, proteína C o S, factor V Leiden, mutación de protrombina G20210A, síndrome antifosfolípido)
-    def trombo(self, trombo, trombo_p): 
-        self.trombo = trombo
-        self.trombo_p = trombo_p
+    trombo = 0
+    trombo_p = -1
 
-    def OR(self, OR, OR_p): #Trauma reciente o cirugía <= 1 mes
-        self.OR = OR
-        self.OR_p = OR_p
+    OR = 0 #Trauma reciente o cirugía <= 1 mes
+    OR_p = -1
 
-    def edad(self, edad, edad_p): #Edad > 70
-        self.edad = edad 
-        self.edad_p = edad_p  
+    edad = 0  #Edad > 70
+    edad_p = -1
 
-    def falla(self, falla, falla_p): #Falla cardíaca y/o respiratoria
-        self.falla = falla
-        self.falla_p = falla_p
+    falla = 0 #Falla cardíaca y/o respiratoria
+    falla_p = -1
     
-    def IAM(self, IAM, IAM_p): #Desorden reumatológico agudo o infarto agudo de miocardio
-        self.IAM = IAM
-        self.IAM_p = IAM_p
+    IAM = 0 #Desorden reumatológico agudo o infarto agudo de miocardio
+    IAM_p = -1
 
-    def BMI(self, BMI, BMI_p): #Obesidad (BMI >= 30)
-        self.BMI = BMI
-        self.BMI_p = BMI_p
+    BMI = 0 #Obesidad (BMI >= 30)
+    BMI_p = -1
 
-    def TH(self, TH, TH_p): #Tratammiento hormonal actual
-        self.TH = TH
-        self.TH_p = TH_p
+    TH = 0 #Tratammiento hormonal actual
+    TH_p = -1
 
     def __str__(self): 
         return "Edad: %s \n" \
@@ -242,6 +195,31 @@ def Edad(f):
         edad.append(0)
     return edad
 
+#Determinar si hay algun criterio no encontrado
+def FindEmpty(Goldman, Lee, Detsky, Padua):
+    G_class = ["edad_p", "IAM_p", "JVD_p", "EA_p", "ECG_p", "CVP_p", "estado_p", "OR_p", "ER_p"]
+    L_class = ["OR_p", "isq_p", "cong_p", "CV_p", "diab_p", "Cr_p"]
+    D_class = ["IAM_p", "ang_p", "angina_p", "edema_p", "EA_p", "ECG_p", "CAP_p", "estado_p", "edad_p", "ER_p"]
+    P_class = ["cancer_p", "TEV_p", "mov_p", "trombo_p", "OR_p", "edad_p", "falla_p", "IAM_p", "BMI_p", "TH_p"]
+    n = 0
+
+    for x in range(9):
+        if getattr(Goldman,G_class[x]) == -1:
+            print(getattr(Goldman,G_class[x]))
+            n = n+1
+    for x in range(6):
+        if getattr(Lee,L_class[x]) == -1:
+            n = n+1
+    for x in range(10):
+        if getattr(Detsky,D_class[x]) == -1:
+            n = n+1
+    for x in range(10):
+        if getattr(Padua,P_class[x]) == -1:
+            n = n+1
+    if n != 0:
+        return 1 #Algun campo se encuentra vacio
+    else:
+        return 0 #Ningun campo esta vacio
 # _.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.
 # CONSTRUCTOR DE FLASH
 
@@ -281,18 +259,25 @@ def indices(name):
     age = Edad(f)[0]
     if age != 0: #Validar se que encontro la edad
         if age > 70:
-            Goldman.edad(age,5) #Si el paciente tiene mas de 70 años se le agregan 5 puntos
-            Detsky.edad(age,5)
-            Padua.edad(age,1)
+            Goldman.edad = age #Si el paciente tiene mas de 70 años se le agregan 5 puntos (1 en Padua)
+            Goldman.edad_p = 5
+            Detsky.edad = age
+            Detsky.edad_p = 5
+            Padua.edad = age
+            Padua.edad_p = 1
         else: 
-            Goldman.edad(age,0) #Si el paciente tiene 70 años o menos no se le agregan puntos
-            Detsky.edad(age,0)
-            Padua.edad(age,0)
-    else: 
-        Goldman.edad(age,-1) #El -1 indica que es un dato faltante que se le debe pedir al usuario
-        Detsky.edad(age,-1)
-        Padua.edad(age,-1)
-    return render_template('validar.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua)
+            Goldman.edad = age #Si el paciente tiene 70 años o menos no se le agregan puntos
+            Detsky.edad = age
+            Padua.edad = age
+            Goldman.edad_p = 0 
+            Detsky.edad_p = 0
+            Padua.edad_p = 0
+        
+    empty = FindEmpty(Goldman, Lee, Detsky, Padua)
+    if empty == 1:
+        return render_template('validar.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua)
+    else:
+        return render_template('print.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua)
     
 #Funcion main driver
 if __name__ == '__main__':

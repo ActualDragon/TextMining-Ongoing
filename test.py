@@ -1,3 +1,5 @@
+"""
+
 import aspose.words as aw #Lectura de archivos
 from nltk.corpus import wordnet as wn
 
@@ -34,7 +36,7 @@ print("Lemma names: ",eng,"\n")
 
 print("Definition: ",syn[0].definition())
 
-"""
+
 
 class Goldman:
     def age(self, age):
@@ -51,3 +53,15 @@ Dany = Goldman()
 Dany.age(5)
 Dany.name("Dany")
 print(Dany) """
+
+
+class MyClass():
+    age = 123
+    name =0
+
+Objeto = MyClass()
+Objeto.age = 666
+#Objeto.name = "Dany"
+
+print(Objeto.age)
+print(Objeto.name)
