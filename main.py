@@ -203,9 +203,9 @@ def FindEmpty(Goldman, Lee, Detsky, Padua):
     P_class = ["cancer_p", "TEV_p", "mov_p", "trombo_p", "OR_p", "edad_p", "falla_p", "IAM_p", "BMI_p", "TH_p"]
     n = 0
 
+    #Validar si existe un atributo vacio
     for x in range(9):
         if getattr(Goldman,G_class[x]) == -1:
-            print(getattr(Goldman,G_class[x]))
             n = n+1
     for x in range(6):
         if getattr(Lee,L_class[x]) == -1:
@@ -273,11 +273,11 @@ def indices(name):
             Detsky.edad_p = 0
             Padua.edad_p = 0
         
-    empty = FindEmpty(Goldman, Lee, Detsky, Padua)
+    empty = FindEmpty(Goldman, Lee, Detsky, Padua) #Determinar si hay atributos vacios
     if empty == 1:
-        return render_template('validar.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua)
+        return render_template('validar.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua) #Si hay atributos vacios, redirigir a un form que pide los datos faltantes
     else:
-        return render_template('print.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua)
+        return render_template('print.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua) #Si no hay atributos vacios, redirigir a una pagina que imprime los resultados
     
 #Funcion main driver
 if __name__ == '__main__':
