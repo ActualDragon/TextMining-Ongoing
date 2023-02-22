@@ -8,7 +8,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
-    <link href="css/styles.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
 
     <!-- Font tags -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +17,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital@1&display=swap" rel="stylesheet">
+
+    <!--<script src="{{ url_for('static', filename='js/script.js') }}"></script>-->
 
     <title>Home</title>
   </head>
@@ -32,16 +34,16 @@
                    <div class="card" style="border-radius: 1rem;">
                      <div class="row g-0">
                         <div class="col-md-4 d-none d-md-block">
-                           <img src="images/pharmacy.jpg" class="img-fluid"/>
+                           <img src="{{ url_for('static', filename='images/icon.jpeg') }}" class="img-fluid"/>
                          </div>
                        <div class="col-md-8 d-flex align-items-center">
                          <div class="card-body py-5 px-4 p-md-5">
        
-                           <form action = "http://localhost:5000/index" method = "post">
+                           <form action = "http://localhost:5000/index" method = "POST" enctype = "multipart/form-data">
                              <h4 class="fw-bold mb-4" id = "file_title">¡Bienvenido!</h4>
                              <p class="mb-4" id = "file_text">Por favor elige el archivo del expediente a analizar</p>
                               <div class="input-group mb-3">
-                                 <input type="file" class="form-control" id="myfile" name="myfile" accept=".doc,.docx,.txt">
+                                 <input type="file" class="form-control" name="file" required>
                               </div>
                              <div class="d-flex justify-content-end pt-1 mb-4">
                                <button class="btn btn-primary btn-rounded" id = "submit_file" type="submit">Enviar</button>
