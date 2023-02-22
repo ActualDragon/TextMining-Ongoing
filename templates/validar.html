@@ -29,6 +29,7 @@
 
 <div class="container-fluid">
     <!-- Form Goldman -->
+    {% if Goldman.is_empty != 0 %}
     <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
         <div class="row d-flex justify-content-center align-items-center">
             <div class="card" style="border-radius: 1rem;">
@@ -38,18 +39,86 @@
                             <form action = "http://localhost:5000/index" method = "POST" enctype = "multipart/form-data">
                                 <h4 class="fw-bold mb-4" id = "file_title">Goldman</h4>
                                 <p class="mb-4" id = "file_text">Índice de Riesgo Cardíaco en Cirugía no Cardiaca</p>
+                                {% if Goldman.edad == -1 %}
                                 <label for="Goldman_edad" class="form-label">Edad</label>
-                                {% if Goldman.edad == 0 %}
-                                    <select class="form-select form-select-sm" id= "Goldman_edad">
-                                        <option selected>No encontre la edad, por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Goldman_edad" required>
+                                        <option selected value="" disabled>No encontre la edad, por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="5">Paciente tiene más de 70 años</option>
                                         <option value="0">El paciente tiene 70 años o menos</option>
                                     </select>
-                                {% else %}
-                                    <span id="Goldman_edad">{{ Goldman.edad }}</span>
                                 {% endif %} 
-
-                                <!-- Agregar un for que revise que si uno de los criterios no existe, genera el boton para enviarlos-->
+                                {% if Goldman.IAM_p == -1 %}
+                                <div class="mb-3">
+                                <label for="Goldman_IAP" class="form-label">Infarto Agudo de Miocardio</label>
+                                    <select class="form-select form-select-sm" id= "Goldman_IAP" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="10">Paciente presentó un IAM en los últimos 6 meses</option>
+                                        <option value="0">Paciente no presentó un IAM en los últimos 6 meses</option>
+                                    </select>
+                                </div>
+                                {% endif %}
+                                {% if Goldman.JVD_p == -1 %}
+                                <div class="mb-3">
+                                <label for="Goldman_JVD" class="form-label">Distensión de la vena yugular</label>
+                                    <select class="form-select form-select-sm" id= "Goldman_JVD" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="11">Paciente presenta distensión de la vena yugular o ruido cardiaco en S3</option>
+                                        <option value="0">Paciente no presenta distensión de la vena yugular o ruido cardiaco en S3</option>
+                                    </select>
+                                </div>
+                                {% endif %}
+                                {% if Goldman.EA_p == -1 %}
+                                <div class="mb-3">
+                                <label for="Goldman_EA" class="form-label">Estenosis aórtica</label>
+                                    <select class="form-select form-select-sm" id= "Goldman_EA" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="3">Paciente presenta estenosis aórtica significativa</option>
+                                        <option value="0">Paciente no presenta estenosis aórtica significativa</option>
+                                    </select>
+                                </div>
+                                {% endif %}
+                                {% if Goldman.ECG_p == -1 %}
+                                <div class="mb-3">
+                                <label for="Goldman_ECG" class="form-label">Electrocardiograma</label>
+                                    <select class="form-select form-select-sm" id= "Goldman_ECG" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="7">Paciente presenta ritmo distinto al sinusal o contracciones auriculares prematuras en su último ECG</option>
+                                        <option value="0">Paciente no presenta ritmo distinto al sinusal o CAP en su último ECG</option>
+                                    </select>
+                                </div>
+                                {% endif %}
+                                {% if Goldman.CVP_p == -1 %}
+                                <div class="mb-3">
+                                <label for="Goldman_CVP" class="form-label">Contracciones ventriculares prematuras</label>
+                                    <select class="form-select form-select-sm" id= "Goldman_CVP" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="7">Paciente presenta más de 5 CVP's / min documentados en cualquier momento</option>
+                                        <option value="0">Paciente no presenta más de 5 CVP's / min documentados en cualquier momento</option>
+                                    </select>
+                                </div>
+                                {% endif %}
+                                {% if Goldman.estado_p == -1 %}
+                                <div class="mb-3">
+                                <label for="Goldman_estado" class="form-label">Pobre estado médico general</label>
+                                <!-- Agregar descripción-->
+                                    <select class="form-select form-select-sm" id= "Goldman_estado" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="3">Paciente presenta pobre estado médico general</option>
+                                        <option value="0">Paciente no presenta pobre estado médico general</option>
+                                    </select>
+                                </div>
+                                {% endif %}
+                                {% if Goldman.OR_p == -1 %}
+                                <div class="mb-3">
+                                <label for="Goldman_OR" class="form-label">Operación</label>
+                                    <select class="form-select form-select-sm" id= "Goldman_OR" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
+                                        <option value="3">La cirugía es intraperitoneal, intratorácica o aórtica</option>
+                                        <option value="4">La cirugía es de emergencia</option>
+                                        <option value="0">La cirugía no es ninguna de las anteriores</option>
+                                    </select>
+                                </div>
+                                {% endif %}
                                  <div class="d-flex justify-content-end pt-1 mb-4">
                                  <button class="btn btn-primary btn-rounded" id = "submit_file" type="submit" >Enviar</button>
                                  </div>
@@ -61,8 +130,10 @@
             </div>
         </div>
     </div>
+    {% endif %} 
     
     <!-- Form Lee -->
+    {% if Lee.is_empty != 0 %}
     <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
         <div class="row d-flex justify-content-center align-items-center">
             <div class="card" style="border-radius: 1rem;">
@@ -84,7 +155,10 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
+
+    {% if Detsky.is_empty != 0 %}
     <!-- Form Detsky -->
     <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
         <div class="row d-flex justify-content-center align-items-center">
@@ -98,18 +172,18 @@
                                 {% if Detsky.edad_p == -1 %}
                                 <div class="mb-3">
                                 <label for="Detsky_edad" class="form-label">Edad</label>
-                                    <select class="form-select form-select-sm" id= "Detsky_edad">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_edad" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="5">Paciente tiene más de 70 años</option>
                                         <option value="0">El paciente tiene 70 años o menos</option>
                                     </select>
                                 </div>
-                                    {% endif %} 
+                                {% endif %} 
                                 {% if Detsky.IAM_p == -1 %}
                                 <div class="mb-3">
                                 <label for="Detsky_IAM" class="form-label">Infarto Agudo de Miocardio</label>
-                                    <select class="form-select form-select-sm" id= "Detsky_IAM">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_IAM" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="10">Se presentó un IAM en los ultimos 6 meses</option>
                                         <option value="5">Se presentó un IAM hace más de 6 meses</option>
                                         <option value="0">Nunca se ha presentado un IAM</option>
@@ -120,8 +194,8 @@
                                 <div class="mb-3">
                                 <label for="Detsky_ang" class="form-label">Angina según la Sociedad Cardiovascular Canadiense</label>
                                 <!-- Agregar descripción-->
-                                    <select class="form-select form-select-sm" id= "Detsky_ang">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_ang" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="10">Se presenta angina clase III</option>
                                         <option value="20">Se presenta angina clase IV</option>
                                         <option value="0">No se presenta angina</option>
@@ -131,8 +205,8 @@
                                 {% if Detsky.angina_p == -1 %}
                                 <div class="mb-3">
                                 <label for="Detsky_angina" class="form-label">Angina Inestable</label>
-                                    <select class="form-select form-select-sm" id= "Detsky_angina">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_angina" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="10">Paciente presenta angina inestable menor a 3 meses</option>
                                         <option value="0">Paciente no presenta angina inestable menor a 3 meses</option>
                                     </select>
@@ -141,8 +215,8 @@
                                 {% if Detsky.edema_p == -1 %}
                                 <div class="mb-3">
                                 <label for="Detsky_edema" class="form-label">Edema pulmonar</label>
-                                    <select class="form-select form-select-sm" id= "Detsky_edema">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_edema" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="10">Se presentó un edema pulmonar en la ultima semana</option>
                                         <option value="5">Se presentó un edema pulmonar hace más de una semana</option>
                                         <option value="0">Nunca se ha presentado un edema pulmonar</option>
@@ -152,8 +226,8 @@
                                 {% if Detsky.EA_p == -1 %}
                                 <div class="mb-3">
                                 <label for="Detsky_EA" class="form-label">Estenosis aórtica crítica</label>
-                                    <select class="form-select form-select-sm" id= "Detsky_EA">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_EA" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="20">Paciente presenta estenosis aórtica crítica</option>
                                         <option value="0">Paciente no presenta estenosis aórtica crítica</option>
                                     </select>
@@ -162,8 +236,8 @@
                                 {% if Detsky.ECG_p == -1 %}
                                 <div class="mb-3">
                                 <label for="Detsky_ECG" class="form-label">Arritmias</label>
-                                    <select class="form-select form-select-sm" id= "Detsky_ECG">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_ECG" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="5">Paciente presenta ritmo no sinusal o extrasístoles auriculares</option>
                                         <option value="0">Paciente no presenta ritmo no sinusal o extrasístoles auriculares</option>
                                     </select>
@@ -172,8 +246,8 @@
                                 {% if Detsky.CAP_p == -1 %}
                                 <div class="mb-3">
                                 <label for="Detsky_CAP" class="form-label">Contracciones auriculares prematuras</label>
-                                    <select class="form-select form-select-sm" id= "Detsky_CAP">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_CAP" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="5">Paciente presenta más de 5 CAP's /min documentados en cualquier momento</option>
                                         <option value="0">Paciente no presenta más de 5 CAP's /min</option>
                                     </select>
@@ -183,8 +257,8 @@
                                 <div class="mb-3">
                                 <label for="Detsky_estado" class="form-label">Pobre estado médico general</label>
                                 <!-- Agregar descripción-->
-                                    <select class="form-select form-select-sm" id= "Detsky_estado">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_estado" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="5">Paciente presenta pobre estado médico general</option>
                                         <option value="0">Paciente no presenta pobre estado médico general</option>
                                     </select>
@@ -193,8 +267,8 @@
                                 {% if Detsky.ER_p == -1 %}
                                 <div class="mb-3">
                                 <label for="Detsky_ER" class="form-label">Operación de emergencia</label>
-                                    <select class="form-select form-select-sm" id= "Detsky_ER">
-                                        <option selected>Por favor selecciona de acuerdo a tu paciente</option>
+                                    <select class="form-select form-select-sm" id= "Detsky_ER" required>
+                                        <option selected value="" disabled>Por favor selecciona de acuerdo a tu paciente</option>
                                         <option value="10">La operación a realizar en el paciente es de emergencia</option>
                                         <option value="0">La operación a realizar en el paciente no es de emergencia</option>
                                     </select>
@@ -211,7 +285,9 @@
             </div>
         </div>
     </div>
+    {% endif %}
     
+    {% if Padua.is_empty != 0 %}
     <!-- Form Padua -->
     <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
         <div class="row d-flex justify-content-center align-items-center">
@@ -242,7 +318,8 @@
             </div>
         </div>
     </div>
-
+    {% endif %} 
+    
 </div>
 
     <footer class="panel-footer">

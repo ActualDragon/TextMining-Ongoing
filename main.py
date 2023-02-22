@@ -33,11 +33,10 @@ class Goldman_Index:
     estado = 0
     estado_p = -1
 
-    OR = 0 #Cirugia intraperitoneal, intratorácica o aórtica
+    OR = 0 #Cirugia intraperitoneal, intratorácica, aórtica o de emergencia
     OR_p = -1
 
-    ER = 0 #Cirugía de emergencia
-    ER_p = -1
+    is_empty = 0
     
     def __str__(self): 
         return "Edad: %s \n" \
@@ -61,6 +60,8 @@ class Puntaje_Lee:
 
     Cr = 0 #Creatinina preoperatoria > a 2 mg/dL (o > 177 micromol/L)
     Cr_p = -1
+
+    is_empty = 0
 
 class Detsky_Index:
     IAM = 0 #Valor encontrado Infarto agudo de miocardio < o > 6 meses
@@ -95,6 +96,8 @@ class Detsky_Index:
     
     ER = 0 #Cirugía de emergencia
     ER_p = -1
+
+    is_empty = 0
 
     def __str__(self): 
         return "Edad: %s \n" \
@@ -131,6 +134,8 @@ class Puntaje_Padua:
 
     TH = 0 #Tratammiento hormonal actual
     TH_p = -1
+
+    is_empty = 0
 
     def __str__(self): 
         return "Edad: %s \n" \
@@ -197,25 +202,29 @@ def Edad(f):
 
 #Determinar si hay algun criterio no encontrado
 def FindEmpty(Goldman, Lee, Detsky, Padua):
-    G_class = ["edad_p", "IAM_p", "JVD_p", "EA_p", "ECG_p", "CVP_p", "estado_p", "OR_p", "ER_p"]
+    G_class = ["edad_p", "IAM_p", "JVD_p", "EA_p", "ECG_p", "CVP_p", "estado_p", "OR_p"]
     L_class = ["OR_p", "isq_p", "cong_p", "CV_p", "diab_p", "Cr_p"]
     D_class = ["IAM_p", "ang_p", "angina_p", "edema_p", "EA_p", "ECG_p", "CAP_p", "estado_p", "edad_p", "ER_p"]
     P_class = ["cancer_p", "TEV_p", "mov_p", "trombo_p", "OR_p", "edad_p", "falla_p", "IAM_p", "BMI_p", "TH_p"]
     n = 0
 
     #Validar si existe un atributo vacio
-    for x in range(9):
+    for x in range(8):
         if getattr(Goldman,G_class[x]) == -1:
             n = n+1
+            Goldman.is_empty = 1
     for x in range(6):
         if getattr(Lee,L_class[x]) == -1:
             n = n+1
+            Lee.is_empty = 1
     for x in range(10):
         if getattr(Detsky,D_class[x]) == -1:
             n = n+1
+            Detsky.is_empty = 1
     for x in range(10):
         if getattr(Padua,P_class[x]) == -1:
             n = n+1
+            Padua.is_empty = 1
     if n != 0:
         return 1 #Algun campo se encuentra vacio
     else:

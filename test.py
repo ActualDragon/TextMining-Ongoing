@@ -58,10 +58,14 @@ print(Dany) """
 class MyClass():
     age = 123
     name =0
-
 Objeto = MyClass()
-Objeto.age = 666
-#Objeto.name = "Dany"
+
+def Func(Objeto):
+    Objeto.age = 666
+    #Objeto.name = "Dany"
+    return 1
+
+f = Func(Objeto)
 
 print(Objeto.age)
 print(Objeto.name)
