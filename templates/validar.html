@@ -21,7 +21,7 @@
 
     <!--<script src="{{ url_for('static', filename='js/script.js') }}"></script>-->
 
-    <title>Indices</title>
+    <title>Validar</title>
   </head>
   <body>
     <header>
@@ -37,7 +37,7 @@
                     <div class="col-md-8 d-flex align-items-center">
                         <div class="card-body py-5 px-4 p-md-5">
                             <form action = "http://localhost:5000/index" method = "POST" enctype = "multipart/form-data">
-                                <h4 class="fw-bold mb-4" id = "file_title">Goldman</h4>
+                                <h4 class="fw-bold mb-4" id = "file_title">Goldman {%Goldman.IAM_p%}</h4>
                                 <p class="mb-4" id = "file_text">Índice de Riesgo Cardíaco en Cirugía no Cardiaca</p>
                                 {% if Goldman.edad == -1 %}
                                 <label for="Goldman_edad" class="form-label">Edad</label>

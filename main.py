@@ -4,7 +4,6 @@ import os #usar funcionalidades dependientes del sistema operativo
 import aspose.words as aw #Lectura de archivos
 import webbrowser #Manejar el navegador
 import filetype
-import nltk #libreria usada para procesamiento de lenguaje natural
 from nltk.corpus import wordnet as wn
 
 #CLASES
@@ -37,10 +36,6 @@ class Goldman_Index:
     OR_p = -1
 
     is_empty = 0
-    
-    def __str__(self): 
-        return "Edad: %s \n" \
-               "Puntaje edad: %i \n" % (self.edad, self.edad_p)
 
 class Puntaje_Lee:
     OR = 0  #Cirugia de alto riesgo (intraperitoneal, intratorácica o suprainguinal vascular) [Valor encontrado]
@@ -99,10 +94,6 @@ class Detsky_Index:
 
     is_empty = 0
 
-    def __str__(self): 
-        return "Edad: %s \n" \
-               "Puntaje edad: %i \n" % (self.edad, self.edad_p)
-
 class Puntaje_Padua:
     cancer = 0 #Valor encontrado Cancer activo -> metástasis y/o han pasado por quimioterapia o radioterapia en los últimos 6 meses
     cancer_p = -1 #Puntaje asignado segun el indice
@@ -137,10 +128,6 @@ class Puntaje_Padua:
 
     is_empty = 0
 
-    def __str__(self): 
-        return "Edad: %s \n" \
-            "Puntaje edad: %i \n" % (self.edad, self.edad_p)
-
 # _.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.
 #FUNCIONES
 
@@ -169,6 +156,7 @@ def Read_File(name):
         p = paragraph.to_string(aw.SaveFormat.TEXT)
         p = p.replace("\\", "/").replace('"','\\"').replace("'","\'") #Escapar caracteres especiales
         p = p.replace('\n', '').replace('\r', '') #Eliminar saltos de linea y el retorno de carro
+        p = p.replace("Á", "A").replace("É", "E").replace("Í", "I").replace("Ó", "O").replace("Ú", "U") #Eliminar acentos para facilitar procesamiento
         f.append(p)
     #Eliminar la copia temporal del archivo
     if os.path.exists(path):
@@ -182,7 +170,7 @@ def Read_File(name):
     return text
 
 #Encontrar la edad del paciente
-def Edad(f):
+def Find_Edad(f, Goldman, Detsky, Padua):
     j = ""; l = ""
     edad = []
     #De acuerdo con el analisis de la estructura de los expedientes, la edad siempre se encuentra antes del tag "ANTECEDENTES"
@@ -198,7 +186,32 @@ def Edad(f):
                 edad = [int(i) for i in f[l].split() if i.isdigit()]
     if l == "":
         edad.append(0)
+    Goldman.edad = edad
+    Detsky.edad = edad
+    Padua.edad = edad
     return edad
+
+#Determinar si ha habido infarto agudo de miocardio
+def Find_IAM(f, Goldman, Detsky):
+    terms = ["INFARTO AGUDO DE MIOCARDIO", "IM", "IMA", "IAM", "INFARTO", "INFARTO CARDIACO", "ATAQUE CARDIACO", "ATAQUE AL CORAZON", "INFARTO DE MIOCARDIO", "INFARTO MIOCARDICO"]
+    list = ""
+    IAM = []
+    syn = wn.synonyms('INFARTO', lang='spa')
+    if syn[0] != []:
+        list = syn[0]
+        for x in list:
+            x = x.upper()
+            x = x.replace("_", " ")
+            terms.append(x)
+    terms.append("IAM")
+    for i in range(len(terms)):
+        for j in range(len(f)):
+            k = f[j].find(terms[i])
+            if k != -1:
+                IAM.append(f[j])
+    if IAM == []:
+        IAM.append(0)
+    return IAM[0]
 
 #Determinar si hay algun criterio no encontrado
 def FindEmpty(Goldman, Lee, Detsky, Padua):
@@ -265,23 +278,22 @@ def indices(name):
     Detsky = Detsky_Index()
     Padua = Puntaje_Padua()
     f = Read_File(name) #Leer los contenidos del archivo
-    age = Edad(f)[0]
+    age = Find_Edad(f,Goldman, Detsky, Padua)[0]
     if age != 0: #Validar se que encontro la edad
         if age > 70:
-            Goldman.edad = age #Si el paciente tiene mas de 70 años se le agregan 5 puntos (1 en Padua)
-            Goldman.edad_p = 5
-            Detsky.edad = age
+            Goldman.edad_p = 5 #Si el paciente tiene mas de 70 años se le agregan 5 puntos (1 en Padua)
             Detsky.edad_p = 5
-            Padua.edad = age
             Padua.edad_p = 1
         else: 
-            Goldman.edad = age #Si el paciente tiene 70 años o menos no se le agregan puntos
-            Detsky.edad = age
-            Padua.edad = age
-            Goldman.edad_p = 0 
+            Goldman.edad_p = 0 #Si el paciente tiene 70 años o menos no se le agregan puntos
             Detsky.edad_p = 0
             Padua.edad_p = 0
-        
+    IAM = Find_IAM(f, Goldman, Detsky)
+    if IAM != 0:
+        Goldman.IAM_p = 10
+    
+    #Falta agregarle a la función la validación de hace cuanto fue el infarto
+
     empty = FindEmpty(Goldman, Lee, Detsky, Padua) #Determinar si hay atributos vacios
     if empty == 1:
         return render_template('validar.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua) #Si hay atributos vacios, redirigir a un form que pide los datos faltantes
