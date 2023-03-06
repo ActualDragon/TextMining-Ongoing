@@ -6,4 +6,4 @@ In this project, we propose the use of text mining algorithms to extract relevan
 
 In the end, it is expected for us to obtain a tool that allows automatization of the calculation of these indices, as well as obtaining a proof of concept of the usefulness of text mining algorithms in the health sector.
 
-The back end of the project is developed in Python, while the front-end display (so the medical professional can visualize the calculated indices) is developed in HTML and CSS.
+The back end of the project is developed in Python, while the front-end display is developed in HTML and CSS using Flask to connect the two.
