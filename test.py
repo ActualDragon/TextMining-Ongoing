@@ -43,7 +43,7 @@ if IAM == []:
 print(IAM[0])
   
 
-"""
+""" 
 syn = wn.lemmas('diabetes', lang='spa')
 print("Lemmas: ",syn)
 print("Lemmas type: ",type(syn[0]),"\n")
