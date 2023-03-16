@@ -128,6 +128,11 @@ class Puntaje_Padua:
 
     is_empty = 0
 
+class Search:
+    Term = 0
+    Line = -1
+    Time = 0
+
 # _.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.
 #FUNCIONES
 
@@ -146,6 +151,7 @@ def validate_file(file):
 #Leer la copia local del archivo que se subió
 def Read_File(name):
     f = []
+    parr = []
     text = []
     basedir = os.path.abspath(os.path.dirname(__file__)) #Obtener el directorio actual
     path = "".join([basedir,"\\static\\uploads\\", name]) #Obtener el directorio del archivo temporal
@@ -166,7 +172,13 @@ def Read_File(name):
     #Eliminar el texto adicional que agrega la libreria aspose.words
     size = len(f)
     for x in range(1,size-2):
-        text.append(f[x])
+        parr.append(f[x])
+    #Separar los parrafos en oraciones
+    for x in parr:
+        sentences = x.split(". ")
+        for i in sentences:
+            text.append(i)
+    print(text)
     return text
 
 #Encontrar la edad del paciente
@@ -204,28 +216,30 @@ def Find_Edad(f, Goldman, Detsky, Padua):
 #Determinar si ha habido infarto agudo de miocardio
 def Find_IAM(f, Goldman, Detsky):
     #Agregar Padua
-    terms = ["INFARTO AGUDO DE MIOCARDIO", "IM", "IMA", "IAM", "INFARTO", "INFARTO CARDIACO", "ATAQUE CARDIACO", "ATAQUE AL CORAZON", "INFARTO DE MIOCARDIO", "INFARTO MIOCARDICO"]
-    list = ""
-    IAM = [0]
-    syn = wn.synonyms('INFARTO', lang='spa')
-    if syn[0] != []:
-        list = syn[0]
-        for x in list:
+    terms =["INFARTO AGUDO DE MIOCARDIO", " IM " , " IMA ", " IAM ", "INFARTO", "INFARTO CARDIACO", "ATAQUE CARDIACO", "ATAQUE AL CORAZON", "INFARTO DE MIOCARDIO", "INFARTO MIOCARDICO", "SINDROME ISQUEMICO CORONARIO AGUDO", " SICA ", "INFARTO AGUDO AL MIOCARDIO CON ELEVACION DEL SEGMENTO ST", "INFARTO AGUDO AL MIOCARDIO SIN ELEVACION DEL SEGMENTO ST"]
+    IAM = Search()
+    syn = wn.synonyms('INFARTO', lang='spa') #Utilizar NLTK para automáticamente detectar sinónimos que no estén determinados anteriormente
+    if syn[0] != []: #Agregarle los sinónimos encontrados a la lista original
+        for x in syn[0]:
             x = x.upper()
             x = x.replace("_", " ")
             terms.append(x)
-    terms.append("IAM")
-    for i in range(len(terms)):
+    for i in range(len(terms)): #Ir recorriendo la lista de términos para buscar coincidencias en el texto
         for j in range(len(f)):
             k = f[j].find(terms[i])
-            if k != -1:
-                IAM.append(f[j])
+            if k != -1: #Si encuentra coincidencias, agregarla al texto
+                IAM.Term=f[j]
+                IAM.Line=j
+                IAM.Time = [int(i) for i in f[j].split() if i.isdigit()]
                 Goldman.IAM = f[j]
                 Detsky.IAM = f[j]
-    if IAM[0] == 0:
-        IAM.append(0)
-    if IAM != 0:
-        Goldman.IAM_p = 10
+    if IAM.Term[0] == 0:
+        IAM.Term.append(0)
+        IAM.Line.append(-1)
+    else:
+        if IAM.time <= 6: #fUNCIÓN PARA ENCONTRAR EL TIEMPO
+            Goldman.IAM_p = 10
+    print(IAM)
     return 0
 
 #Determinar si hay algun criterio no encontrado
