@@ -4,7 +4,9 @@ import os #usar funcionalidades dependientes del sistema operativo
 import aspose.words as aw #Lectura de archivos
 import webbrowser #Manejar el navegador
 import filetype
-from nltk.corpus import wordnet as wn
+import spacy
+
+nlp = spacy.load('es_core_news_sm') #Cargar el modelo en español de spaCy
 
 #CLASES
 class Goldman_Index:
@@ -131,7 +133,7 @@ class Puntaje_Padua:
 class Search:
     Term = 0
     Line = -1
-    Time = 0
+    Time = [0]
 
 # _.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.
 #FUNCIONES
@@ -154,7 +156,7 @@ def Read_File(name):
     parr = []
     text = []
     basedir = os.path.abspath(os.path.dirname(__file__)) #Obtener el directorio actual
-    path = "".join([basedir,"\\static\\uploads\\", name]) #Obtener el directorio del archivo temporal
+    path = f"{basedir}\\static\\uploads\\{name}" #Obtener el directorio del archivo temporal
     doc = aw.Document(path) # Cargar el archivo a leer
     # Leer el contenido de los parrafos tipo nodo
     for paragraph in doc.get_child_nodes(aw.NodeType.PARAGRAPH, True) :
@@ -177,9 +179,32 @@ def Read_File(name):
     for x in parr:
         sentences = x.split(". ")
         for i in sentences:
-            text.append(i)
+            text.append(i.lower())
     print(text)
     return text
+
+#Encontrar coincidencias en el texto
+def Find_Syn(terms,f):
+    IAM = Search()
+    for i in range(len(terms)): #Ir recorriendo la lista de términos para buscar coincidencias en el texto
+        for j in range(len(f)):
+            k = f[j].find(terms[i])
+            if k != -1: #Si encuentra coincidencias, agregarla al objeto
+                IAM.Term = f[j] #El término encontrado en el texto
+                IAM.Line = j #Número de elemento de la lista
+    return IAM
+
+#Determinar cúando presentó la condición
+def Find_Time(f,x):
+    text = f[x.Line]
+    doc = nlp(text) #Procesar el texto con spaCy
+    # Extraer todas las palabras relacionadas con tiempo que sean sustantivos o adjetivos
+    tiempos = [f"{doc[i-1].text} {token.text}" for i, token in enumerate(doc) if token.pos_ in ['NOUN', 'ADJ'] and ('dia' in token.text or 'dias' in token.text or 'semana' in token.text or 'semanas' in token.text or 'mes' in token.text or 'meses' in token.text or 'año' in token.text or 'años' in token.text)]
+    if tiempos != []:
+        del x.Time[0]
+        x.Time.append(tiempos)
+        return tiempos[0]
+    return 0
 
 #Encontrar la edad del paciente
 def Find_Edad(f, Goldman, Detsky, Padua):
@@ -187,23 +212,25 @@ def Find_Edad(f, Goldman, Detsky, Padua):
     edad = []
     #De acuerdo con el analisis de la estructura de los expedientes, la edad siempre se encuentra antes del tag "ANTECEDENTES"
     for x in range(len(f)):
-        i = f[x].find("ANTECEDENTES")
+        i = f[x].find("antecedentes")
         if i != -1:
             j =  x #Encontrar el elemento de la lista donde empiezan los antecedentes (pues la edad va a estar antes)
     if j != "":
         for x in range(j):
-            k = f[x].find("A\u00d1OS")
-            if k != -1:
-                l =  x #Elemento de la lista que contiene la edad
-                edad = [int(i) for i in f[l].split() if i.isdigit()]
-    if l == "":
+            doc = nlp(f[x]) #Procesar el texto con spaCy
+            # Extraer todas las palabras relacionadas con edad que sean sustantivos o adjetivos
+            edad = [f"{doc[i-1].text}" for i, token in enumerate(doc) if token.pos_ in ['NOUN', 'ADJ'] and ('años' in token.text)]
+    else:
+        print("No hay antecedentes")
+    if edad == []:
         edad.append(0)
     Goldman.edad = edad
     Detsky.edad = edad
     Padua.edad = edad
 
-    if edad[0] != 0: #Validar se que encontro la edad
-        if edad[0] > 70:
+    age = int(edad[0])
+    if age != 0: #Validar se que encontro la edad
+        if age > 70:
             Goldman.edad_p = 5 #Si el paciente tiene mas de 70 años se le agregan 5 puntos (1 en Padua)
             Detsky.edad_p = 5
             Padua.edad_p = 1
@@ -215,31 +242,28 @@ def Find_Edad(f, Goldman, Detsky, Padua):
 
 #Determinar si ha habido infarto agudo de miocardio
 def Find_IAM(f, Goldman, Detsky):
-    #Agregar Padua
-    terms =["INFARTO AGUDO DE MIOCARDIO", " IM " , " IMA ", " IAM ", "INFARTO", "INFARTO CARDIACO", "ATAQUE CARDIACO", "ATAQUE AL CORAZON", "INFARTO DE MIOCARDIO", "INFARTO MIOCARDICO", "SINDROME ISQUEMICO CORONARIO AGUDO", " SICA ", "INFARTO AGUDO AL MIOCARDIO CON ELEVACION DEL SEGMENTO ST", "INFARTO AGUDO AL MIOCARDIO SIN ELEVACION DEL SEGMENTO ST"]
-    IAM = Search()
-    syn = wn.synonyms('INFARTO', lang='spa') #Utilizar NLTK para automáticamente detectar sinónimos que no estén determinados anteriormente
-    if syn[0] != []: #Agregarle los sinónimos encontrados a la lista original
-        for x in syn[0]:
-            x = x.upper()
-            x = x.replace("_", " ")
-            terms.append(x)
-    for i in range(len(terms)): #Ir recorriendo la lista de términos para buscar coincidencias en el texto
-        for j in range(len(f)):
-            k = f[j].find(terms[i])
-            if k != -1: #Si encuentra coincidencias, agregarla al texto
-                IAM.Term=f[j]
-                IAM.Line=j
-                IAM.Time = [int(i) for i in f[j].split() if i.isdigit()]
-                Goldman.IAM = f[j]
-                Detsky.IAM = f[j]
-    if IAM.Term[0] == 0:
-        IAM.Term.append(0)
-        IAM.Line.append(-1)
-    else:
-        if IAM.time <= 6: #fUNCIÓN PARA ENCONTRAR EL TIEMPO
-            Goldman.IAM_p = 10
-    print(IAM)
+    terms =["infarto agudo de miocardio", "im", "ima", "iam", "infarto", "infarto cardiaco", "infarto agudo", "ataque cardiaco", "ataque al corazón", "infarto de miocardio", "infarto miocárdico", "síndrome isquémico coronario agudo", "sica", "infarto agudo al miocardio con elevación del segmento st", "infarto agudo al miocardio sin elevación del segmento st"]
+    text = Find_Syn(terms,f)
+    Goldman.IAM = text.Term
+    Detsky.IAM = text.Term
+    time = Find_Time(f,text)
+    if time != 0:
+        i = time.split()
+        match i[1]:
+            case "meses":
+                if int(i[0]) <=6:
+                    Goldman.IAM_p = 10
+                    Detsky.IAM_p = 10
+            case "semanas":
+                if int(i[0]) <=24:
+                    Goldman.IAM_p = 10
+                    Detsky.IAM_p = 10
+            case "dias":
+                if int(i[0]) <=183:
+                    Goldman.IAM_p = 10
+                    Detsky.IAM_p = 10
+            case _:
+                Detsky.IAM_p = 5
     return 0
 
 #Determinar si hay algun criterio no encontrado
