@@ -1,5 +1,15 @@
+import atexit
+
+print("Started")
+input("Press Enter to continue...")
+
+@atexit.register
+def goodbye():
+    print("You are now leaving the Python sector")
 
 
+
+"""
 from nltk.corpus import wordnet as wn
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -48,7 +58,7 @@ else:
 print("Similarity score:", average_score)
 
 
-"""
+
 from nltk.corpus import wordnet
 import nltk
 from nltk.tokenize import word_tokenize
