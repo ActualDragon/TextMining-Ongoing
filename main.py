@@ -5,7 +5,7 @@ import aspose.words as aw #Lectura de archivos
 import webbrowser #Manejar el navegador
 import filetype
 import spacy #Procesamiento de lenguaje natural
-
+from flaskwebgui import FlaskUI #Import the library that converts the flask web app to a desktop app
 
 nlp = spacy.load('es_core_news_sm') #Cargar el modelo en español de spaCy
 
@@ -313,9 +313,12 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 #Limitar archivos a maximo 1MB
 app.config['UPLOAD_PATH'] = r'./static/uploads' #Path al que se subira la copia temporal de los archivos a ser procesados
 app.config['UPLOAD_EXTENSIONS'] = ['.doc', '.docx'] #Extensiones permitidas
 
+#Crear interfaz de usuario para la aplicacion de escritorio
+ui = FlaskUI(app=app, server="flask", port=5000)
+
 #Generar la home page
 @app.route('/')
-def index():
+def load():
     #Eliminar todos las copias temporales de los expedientes que se hayan quedado almacenados si la aplicación no se cerró adecuadamente
     basedir = os.path.abspath(os.path.dirname(__file__)) #Obtener el directorio actual
     path = f"{basedir}\\static\\uploads" #Obtener el directorio de los archivos temporales
@@ -327,7 +330,7 @@ def index():
 
 #Recibir el archivo subido
 @app.route('/index', methods=['POST'])
-def load():
+def index():
     uploaded_file = request.files['file']
     filename = secure_filename(uploaded_file.filename) #validar el nombre del archivo
     if filename != '': #validar que si se subió un archivo
@@ -359,7 +362,8 @@ def indices(name):
 
 #Funcion main driver
 if __name__ == '__main__':
-    webbrowser.open_new("http://127.0.0.1:5000") #Abrir la pagina principal en el navegador cuando se corre la app
-    app.run() #Correr la aplicación en el servidor local
+    #webbrowser.open_new("http://127.0.0.1:5000") #Abrir la pagina principal en el navegador cuando se corre la app
+    #app.run()
+    ui.run()
 
 #https://medium.com/@fareedkhandev/create-desktop-application-using-flask-framework-ee4386a583e9
