@@ -1,10 +1,13 @@
 from flask import Flask, redirect, url_for, request, render_template, session, abort #Framework que permite crear aplicaciones web
-from werkzeug.utils import secure_filename #validar el archivo -> "Never trust user input"
+from werkzeug.utils import secure_filename #validar el archivo
 import os #usar funcionalidades dependientes del sistema operativo
 import aspose.words as aw #Lectura de archivos
 import webbrowser #Manejar el navegador
 import filetype
-from nltk.corpus import wordnet as wn
+import spacy #Procesamiento de lenguaje natural
+from flaskwebgui import FlaskUI #Import the library that converts the flask web app to a desktop app
+
+nlp = spacy.load('es_core_news_sm') #Cargar el modelo en español de spaCy
 
 #CLASES
 class Goldman_Index:
@@ -14,8 +17,11 @@ class Goldman_Index:
     IAM = 0 #Infarto agudo de miocardio
     IAM_p = -1
 
-    JVD = 0 #Distención de la vena yugular o ruido cardiaco en S3
+    JVD = 0 #Distención de la vena yugular
     JVD_p = -1
+
+    RS3 = 0 #Ruido cardiaco en S3
+    RS3 = -1
 
     EA = 0 #Estenosis aórtica
     EA_p = -1
@@ -128,6 +134,10 @@ class Puntaje_Padua:
 
     is_empty = 0
 
+class Search:
+    Term = 0
+    Line = -1
+
 # _.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.
 #FUNCIONES
 
@@ -146,9 +156,10 @@ def validate_file(file):
 #Leer la copia local del archivo que se subió
 def Read_File(name):
     f = []
+    parr = []
     text = []
     basedir = os.path.abspath(os.path.dirname(__file__)) #Obtener el directorio actual
-    path = "".join([basedir,"\\static\\uploads\\", name]) #Obtener el directorio del archivo temporal
+    path = f"{basedir}\\static\\uploads\\{name}" #Obtener el directorio del archivo temporal
     doc = aw.Document(path) # Cargar el archivo a leer
     # Leer el contenido de los parrafos tipo nodo
     for paragraph in doc.get_child_nodes(aw.NodeType.PARAGRAPH, True) :
@@ -158,16 +169,37 @@ def Read_File(name):
         p = p.replace('\n', '').replace('\r', '') #Eliminar saltos de linea y el retorno de carro
         p = p.replace("Á", "A").replace("É", "E").replace("Í", "I").replace("Ó", "O").replace("Ú", "U") #Eliminar acentos para facilitar procesamiento
         f.append(p)
-    #Eliminar la copia temporal del archivo
-    if os.path.exists(path):
-        os.remove(path)
-    else:
-        print("El archivo no existe")
     #Eliminar el texto adicional que agrega la libreria aspose.words
     size = len(f)
     for x in range(1,size-2):
-        text.append(f[x])
+        parr.append(f[x])
+    #Separar los parrafos en oraciones
+    for x in parr:
+        sentences = x.split(". ")
+        for i in sentences:
+            text.append(i.lower())
     return text
+
+#Encontrar coincidencias en el texto
+def Find_Syn(terms,f):
+    IAM = Search()
+    for i in range(len(terms)): #Ir recorriendo la lista de términos para buscar coincidencias en el texto
+        for j in range(len(f)):
+            k = f[j].find(terms[i])
+            if k != -1: #Si encuentra coincidencias, agregarla al objeto
+                IAM.Term = f[j] #El término encontrado en el texto
+                IAM.Line = j #Número de elemento de la lista
+    return IAM
+
+#Determinar cúando presentó la condición
+def Find_Time(f,x):
+    text = f[x.Line]
+    doc = nlp(text) #Procesar el texto con spaCy
+    # Extraer todas las palabras relacionadas con tiempo que sean sustantivos o adjetivos
+    tiempos = [f"{doc[i-1].text} {token.text}" for i, token in enumerate(doc) if token.pos_ in ['NOUN', 'ADJ'] and ('dia' in token.text or 'dias' in token.text or 'semana' in token.text or 'semanas' in token.text or 'mes' in token.text or 'meses' in token.text or 'año' in token.text or 'años' in token.text)]
+    if tiempos != []:
+        return tiempos[0]
+    return 0
 
 #Encontrar la edad del paciente
 def Find_Edad(f, Goldman, Detsky, Padua):
@@ -175,23 +207,25 @@ def Find_Edad(f, Goldman, Detsky, Padua):
     edad = []
     #De acuerdo con el analisis de la estructura de los expedientes, la edad siempre se encuentra antes del tag "ANTECEDENTES"
     for x in range(len(f)):
-        i = f[x].find("ANTECEDENTES")
+        i = f[x].find("antecedentes")
         if i != -1:
             j =  x #Encontrar el elemento de la lista donde empiezan los antecedentes (pues la edad va a estar antes)
     if j != "":
         for x in range(j):
-            k = f[x].find("A\u00d1OS")
-            if k != -1:
-                l =  x #Elemento de la lista que contiene la edad
-                edad = [int(i) for i in f[l].split() if i.isdigit()]
-    if l == "":
+            doc = nlp(f[x]) #Procesar el texto con spaCy
+            # Extraer todas las palabras relacionadas con edad que sean sustantivos o adjetivos
+            edad = [f"{doc[i-1].text}" for i, token in enumerate(doc) if token.pos_ in ['NOUN', 'ADJ'] and ('años' in token.text)]
+    else:
+        print("No hay antecedentes")
+    if edad == []:
         edad.append(0)
     Goldman.edad = edad
     Detsky.edad = edad
     Padua.edad = edad
 
-    if edad[0] != 0: #Validar se que encontro la edad
-        if edad[0] > 70:
+    age = int(edad[0])
+    if age != 0: #Validar se que encontro la edad
+        if age > 70:
             Goldman.edad_p = 5 #Si el paciente tiene mas de 70 años se le agregan 5 puntos (1 en Padua)
             Detsky.edad_p = 5
             Padua.edad_p = 1
@@ -203,29 +237,43 @@ def Find_Edad(f, Goldman, Detsky, Padua):
 
 #Determinar si ha habido infarto agudo de miocardio
 def Find_IAM(f, Goldman, Detsky):
-    #Agregar Padua
-    terms = ["INFARTO AGUDO DE MIOCARDIO", "IM", "IMA", "IAM", "INFARTO", "INFARTO CARDIACO", "ATAQUE CARDIACO", "ATAQUE AL CORAZON", "INFARTO DE MIOCARDIO", "INFARTO MIOCARDICO"]
-    list = ""
-    IAM = [0]
-    syn = wn.synonyms('INFARTO', lang='spa')
-    if syn[0] != []:
-        list = syn[0]
-        for x in list:
-            x = x.upper()
-            x = x.replace("_", " ")
-            terms.append(x)
-    terms.append("IAM")
-    for i in range(len(terms)):
-        for j in range(len(f)):
-            k = f[j].find(terms[i])
-            if k != -1:
-                IAM.append(f[j])
-                Goldman.IAM = f[j]
-                Detsky.IAM = f[j]
-    if IAM[0] == 0:
-        IAM.append(0)
-    if IAM != 0:
-        Goldman.IAM_p = 10
+    terms =["infarto agudo de miocardio", " im ", " ima ", " iam ", "infarto", "infarto cardiaco", "infarto agudo", "ataque cardiaco", "ataque al corazón", "infarto de miocardio", "infarto miocárdico", "síndrome isquémico coronario agudo", " sica ", "infarto agudo al miocardio con elevación del segmento st", "infarto agudo al miocardio sin elevación del segmento st"]
+    text = Find_Syn(terms,f)
+    print(text.Term)
+    if text.Term != 0: #Determinar si se encontró una coincidencia
+        Goldman.IAM = text.Term
+        Detsky.IAM = text.Term
+        time = Find_Time(f,text)
+        if time != 0:
+            i = time.split()
+            match i[1]:
+                case "meses":
+                    if int(i[0]) <=6:
+                        Goldman.IAM_p = 10
+                        Detsky.IAM_p = 10
+                case "semanas":
+                    if int(i[0]) <=24:
+                        Goldman.IAM_p = 10
+                        Detsky.IAM_p = 10
+                case "dias":
+                    if int(i[0]) <=183:
+                        Goldman.IAM_p = 10
+                        Detsky.IAM_p = 10
+                case _:
+                    Detsky.IAM_p = 5
+        else:
+            Detsky.IAM_p = 0
+            Goldman.IAM_p = 0
+    return 0
+
+#Determinar si hay distensión de la vena yugular
+def Find_JVD(f, Goldman):
+    terms = [" JVD ", "pletora yugular", "ingurgitacion yugular", "pletora de la yugular", "ingurgitacion de la yugular", "pletora de la vena yugular", "ingurgitacion de la vena yugular", "distension yugular", "distension de la yugular" , "distension de la vena yugular"]
+    text = Find_Syn(terms,f)
+    print(text.Term)
+    if text.Term != 0: #Determinar si se encontró una coincidencia
+        Goldman.JVD = text.Term
+        Goldman.JVD_p = 11
     return 0
 
 #Determinar si hay algun criterio no encontrado
@@ -265,14 +313,24 @@ app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 #Limitar archivos a maximo 1MB
 app.config['UPLOAD_PATH'] = r'./static/uploads' #Path al que se subira la copia temporal de los archivos a ser procesados
 app.config['UPLOAD_EXTENSIONS'] = ['.doc', '.docx'] #Extensiones permitidas
 
+#Crear interfaz de usuario para la aplicacion de escritorio
+ui = FlaskUI(app=app, server="flask", port=5000)
+
 #Generar la home page
 @app.route('/')
-def index():
+def load():
+    #Eliminar todos las copias temporales de los expedientes que se hayan quedado almacenados si la aplicación no se cerró adecuadamente
+    basedir = os.path.abspath(os.path.dirname(__file__)) #Obtener el directorio actual
+    path = f"{basedir}\\static\\uploads" #Obtener el directorio de los archivos temporales
+
+    filelist = [ f for f in os.listdir(path) if f.endswith(".doc") or f.endswith(".docx") ] #Obtener los archivos
+    for f in filelist:
+        os.remove(os.path.join(path, f)) #Eliminar los archivos
     return render_template('index.html')
 
 #Recibir el archivo subido
 @app.route('/index', methods=['POST'])
-def load():
+def index():
     uploaded_file = request.files['file']
     filename = secure_filename(uploaded_file.filename) #validar el nombre del archivo
     if filename != '': #validar que si se subió un archivo
@@ -295,6 +353,7 @@ def indices(name):
     f = Read_File(name) #Leer los contenidos del archivo
     Find_Edad(f,Goldman, Detsky, Padua)
     Find_IAM(f, Goldman, Detsky)
+    Find_JVD(f, Goldman)
     empty = FindEmpty(Goldman, Lee, Detsky, Padua) #Determinar si hay atributos vacios
     if empty == 1:
         return render_template('validar.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua) #Si hay atributos vacios, redirigir a un form que pide los datos faltantes
@@ -303,7 +362,8 @@ def indices(name):
 
 #Funcion main driver
 if __name__ == '__main__':
-    webbrowser.open_new("http://127.0.0.1:5000") #Abrir la pagina principal en el navegador cuando se corre la app
-    app.run() #Correr la aplicación en el servidor local
+    #webbrowser.open_new("http://127.0.0.1:5000") #Abrir la pagina principal en el navegador cuando se corre la app
+    #app.run()
+    ui.run()
 
-#https://werkzeug.palletsprojects.com/en/2.1.x/serving/#shutting-down-the-server
+#https://medium.com/@fareedkhandev/create-desktop-application-using-flask-framework-ee4386a583e9
