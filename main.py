@@ -185,7 +185,11 @@ def Find_Syn(terms,f):
     IAM = Search()
     for i in range(len(terms)): #Ir recorriendo la lista de términos para buscar coincidencias en el texto
         for j in range(len(f)):
-            k = f[j].find(terms[i])
+            doc = nlp(f[j]) #Procesar el texto con spacy
+            filter = [token.text for token in doc if not token.is_stop or token.text == 'no'] #Quitar palabras vacías (de, por, en, la, etc) pero conservar "no"
+            sentence = ' '.join(filter)
+            print("Sentence %s" %sentence)
+            k = sentence.find(terms[i])
             if k != -1: #Si encuentra coincidencias, agregarla al objeto
                 IAM.Term = f[j] #El término encontrado en el texto
                 IAM.Line = j #Número de elemento de la lista
@@ -237,7 +241,7 @@ def Find_Edad(f, Goldman, Detsky, Padua):
 
 #Determinar si ha habido infarto agudo de miocardio
 def Find_IAM(f, Goldman, Detsky):
-    terms =["infarto agudo de miocardio", " im ", " ima ", " iam ", "infarto", "infarto cardiaco", "infarto agudo", "ataque cardiaco", "ataque al corazón", "infarto de miocardio", "infarto miocárdico", "síndrome isquémico coronario agudo", " sica ", "infarto agudo al miocardio con elevación del segmento st", "infarto agudo al miocardio sin elevación del segmento st"]
+    terms = ["infarto agudo miocardio", " im ", " ima ", " iam ", "infarto cardiaco", "ataque cardiaco", "ataque corazón", "infarto miocardio", "infarto miocardico", "síndrome isquémico coronario agudo", "sica"]
     text = Find_Syn(terms,f)
     print(text.Term)
     if text.Term != 0: #Determinar si se encontró una coincidencia
@@ -268,7 +272,7 @@ def Find_IAM(f, Goldman, Detsky):
 
 #Determinar si hay distensión de la vena yugular
 def Find_JVD(f, Goldman):
-    terms = [" JVD ", "pletora yugular", "ingurgitacion yugular", "pletora de la yugular", "ingurgitacion de la yugular", "pletora de la vena yugular", "ingurgitacion de la vena yugular", "distension yugular", "distension de la yugular" , "distension de la vena yugular"]
+    terms = ["pletora yugular", "ingurgitacion yugular", " JVD ", "distension vena yugular", "distension yugular", "pletora vena yugular", "ingurgitacion vena yugular"]
     text = Find_Syn(terms,f)
     print(text.Term)
     if text.Term != 0: #Determinar si se encontró una coincidencia
@@ -362,8 +366,8 @@ def indices(name):
 
 #Funcion main driver
 if __name__ == '__main__':
-    #webbrowser.open_new("http://127.0.0.1:5000") #Abrir la pagina principal en el navegador cuando se corre la app
-    #app.run()
-    ui.run()
+    webbrowser.open_new("http://127.0.0.1:5000") #Abrir la pagina principal en el navegador cuando se corre la app
+    app.run()
+    #ui.run()
 
 #https://medium.com/@fareedkhandev/create-desktop-application-using-flask-framework-ee4386a583e9

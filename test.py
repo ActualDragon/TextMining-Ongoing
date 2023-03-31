@@ -1,4 +1,18 @@
-import atexit
+import spacy
+nlp = spacy.load('es_core_news_sm')
+
+text = "El perro no corre por el parque"
+
+doc = nlp(text)
+
+# Remove stop words
+filtered_tokens = [token.text for token in doc if not token.is_stop]
+filtered_tokens = [token.text for token in doc if not token.is_stop or token.text == 'no']
+
+print(filtered_tokens)
+
+
+"""import atexit
 
 print("Started")
 input("Press Enter to continue...")
@@ -7,9 +21,6 @@ input("Press Enter to continue...")
 def goodbye():
     print("You are now leaving the Python sector")
 
-
-
-"""
 from nltk.corpus import wordnet as wn
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -86,7 +97,7 @@ s = []
 text = []
 doc = aw.Document("C:\\Users\\danyg\\Documents\\Internado\\prueba.doc") # Cargar el archivo a leer
     # Leer el contenido de los parrafos tipo nodo
-for paragraph in doc.get_child_nodes(aw.NodeType.PARAGRAPH, True) :    
+for paragraph in doc.get_child_nodes(aw.NodeType.PARAGRAPH, True) :
     paragraph = paragraph.as_paragraph()
     p = paragraph.to_string(aw.SaveFormat.TEXT)
     p = p.replace("\\", "/").replace('"','\\"').replace("'","\'") #Escapar caracteres especiales
@@ -120,7 +131,6 @@ for i in range(len(terms)):
 if IAM == []:
     IAM.append(0)
 print(IAM[0])
-  
 
 
 syn = wn.lemmas('diabetes', lang='spa')
@@ -145,15 +155,15 @@ class Goldman:
 
     def name(self,name):
         self.name = name
-    
-    def __str__(self): 
+
+    def __str__(self):
         return "Name: %s \n" \
                "Age: %i" % (self.name, self.age)
 
 Dany = Goldman()
 Dany.age(5)
 Dany.name("Dany")
-print(Dany) 
+print(Dany)
 
 
 class MyClass():
@@ -171,4 +181,4 @@ f = Func(Objeto)
 print(Objeto.age)
 print(Objeto.name)
 
-""" 
+"""
