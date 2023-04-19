@@ -30,14 +30,14 @@
 <div class="container-fluid">
     <!-- Form Goldman -->
     {% if Goldman.is_empty != 0 %}
-    <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
+    <div class = "m-3 p-3 col-md-4 rounded d-inline-block">
         <div class="row d-flex justify-content-center align-items-center">
             <div class="card" style="border-radius: 1rem;">
                 <div class="row g-0">
                     <div class="col-md-12 d-flex align-items-center">
                         <div class="card-body py-5 px-4 p-md-5">
                             <form action = "http://localhost:5000/index" method = "POST" enctype = "multipart/form-data">
-                                <h4 class="fw-bold mb-4" id = "file_title">Goldman</h4>
+                                <h4 class="fw-bold mb-4" id = "file_title">Índice de Goldman</h4>
                                 <p class="mb-4" id = "file_text">Índice de Riesgo Cardíaco en Cirugía no Cardiaca</p>
                                 {% if Goldman.edad_p == -1 %}
                                 <label for="Goldman_edad" class="form-label">Edad</label>
@@ -134,7 +134,7 @@
 
     <!-- Form Lee -->
     {% if Lee.is_empty != 0 %}
-    <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
+    <div class = "m-3 p-3 col-md-4 rounded d-inline-block">
         <div class="row d-flex justify-content-center align-items-center">
             <div class="card" style="border-radius: 1rem;">
                 <div class="row g-0">
@@ -219,7 +219,7 @@
 
     {% if Detsky.is_empty != 0 %}
     <!-- Form Detsky -->
-    <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
+    <div class = "m-3 p-3 col-md-4 rounded d-inline-block">
         <div class="row d-flex justify-content-center align-items-center">
             <div class="card" style="border-radius: 1rem;">
                 <div class="row g-0">
@@ -348,7 +348,7 @@
 
     {% if Padua.is_empty != 0 %}
     <!-- Form Padua -->
-    <div class = "m-3 p-3 col-md-4 border border-dark rounded d-inline-block">
+    <div class = "m-3 p-3 col-md-4 rounded d-inline-block">
         <div class="row d-flex justify-content-center align-items-center">
             <div class="card" style="border-radius: 1rem;">
                 <div class="row g-0">
@@ -468,9 +468,6 @@
         </div>
     </div>
     {% endif %}
-
-    <span>Edad {{Goldman.edad}}</span>
-    <span>IAM {{Goldman.IAM}}</span>
 </div>
 
     <footer class="panel-footer">

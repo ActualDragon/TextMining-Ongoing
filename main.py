@@ -1,13 +1,9 @@
 from flask import Flask, redirect, url_for, request, render_template, session, abort #Framework que permite crear aplicaciones web
 from werkzeug.utils import secure_filename #validar el archivo
 import os #usar funcionalidades dependientes del sistema operativo
-import aspose.words as aw #Lectura de archivos
 import webbrowser #Manejar el navegador
-import filetype
-import spacy #Procesamiento de lenguaje natural
 from flaskwebgui import FlaskUI #Import the library that converts the flask web app to a desktop app
-
-nlp = spacy.load('es_core_news_sm') #Cargar el modelo en español de spaCy
+import functions as fx
 
 #CLASES
 class Goldman_Index:
@@ -21,7 +17,7 @@ class Goldman_Index:
     JVD_p = -1
 
     RS3 = 0 #Ruido cardiaco en S3
-    RS3 = -1
+    RS3_p = -1
 
     EA = 0 #Estenosis aórtica
     EA_p = -1
@@ -134,181 +130,7 @@ class Puntaje_Padua:
 
     is_empty = 0
 
-class Search:
-    Term = 0
-    Line = -1
 
-# _.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.
-#FUNCIONES
-
-#Validar que el archivo sea del tipo permitido (sin importar la extension que tenga)
-def validate_file(file):
-    header = file.read()
-    file.seek(0)
-    format = filetype.guess(header)
-    if (format is None):
-        return None
-    format = format.extension
-    if (format != "doc") and (format != "docx"):
-        return None
-    return '.' + format
-
-#Leer la copia local del archivo que se subió
-def Read_File(name):
-    f = []
-    parr = []
-    text = []
-    basedir = os.path.abspath(os.path.dirname(__file__)) #Obtener el directorio actual
-    path = f"{basedir}\\static\\uploads\\{name}" #Obtener el directorio del archivo temporal
-    doc = aw.Document(path) # Cargar el archivo a leer
-    # Leer el contenido de los parrafos tipo nodo
-    for paragraph in doc.get_child_nodes(aw.NodeType.PARAGRAPH, True) :
-        paragraph = paragraph.as_paragraph()
-        p = paragraph.to_string(aw.SaveFormat.TEXT)
-        p = p.replace("\\", "/").replace('"','\\"').replace("'","\'") #Escapar caracteres especiales
-        p = p.replace('\n', '').replace('\r', '') #Eliminar saltos de linea y el retorno de carro
-        p = p.replace("Á", "A").replace("É", "E").replace("Í", "I").replace("Ó", "O").replace("Ú", "U") #Eliminar acentos para facilitar procesamiento
-        f.append(p)
-    #Eliminar el texto adicional que agrega la libreria aspose.words
-    size = len(f)
-    for x in range(1,size-2):
-        parr.append(f[x])
-    #Separar los parrafos en oraciones
-    for x in parr:
-        sentences = x.split(". ")
-        for i in sentences:
-            text.append(i.lower())
-    return text
-
-#Encontrar coincidencias en el texto
-def Find_Syn(terms,f):
-    IAM = Search()
-    for i in range(len(terms)): #Ir recorriendo la lista de términos para buscar coincidencias en el texto
-        for j in range(len(f)):
-            doc = nlp(f[j]) #Procesar el texto con spacy
-            filter = [token.text for token in doc if not token.is_stop or token.text == 'no'] #Quitar palabras vacías (de, por, en, la, etc) pero conservar "no"
-            sentence = ' '.join(filter)
-            print("Sentence %s" %sentence)
-            k = sentence.find(terms[i])
-            if k != -1: #Si encuentra coincidencias, agregarla al objeto
-                IAM.Term = f[j] #El término encontrado en el texto
-                IAM.Line = j #Número de elemento de la lista
-    return IAM
-
-#Determinar cúando presentó la condición
-def Find_Time(f,x):
-    text = f[x.Line]
-    doc = nlp(text) #Procesar el texto con spaCy
-    # Extraer todas las palabras relacionadas con tiempo que sean sustantivos o adjetivos
-    tiempos = [f"{doc[i-1].text} {token.text}" for i, token in enumerate(doc) if token.pos_ in ['NOUN', 'ADJ'] and ('dia' in token.text or 'dias' in token.text or 'semana' in token.text or 'semanas' in token.text or 'mes' in token.text or 'meses' in token.text or 'año' in token.text or 'años' in token.text)]
-    if tiempos != []:
-        return tiempos[0]
-    return 0
-
-#Encontrar la edad del paciente
-def Find_Edad(f, Goldman, Detsky, Padua):
-    j = ""; l = ""
-    edad = []
-    #De acuerdo con el analisis de la estructura de los expedientes, la edad siempre se encuentra antes del tag "ANTECEDENTES"
-    for x in range(len(f)):
-        i = f[x].find("antecedentes")
-        if i != -1:
-            j =  x #Encontrar el elemento de la lista donde empiezan los antecedentes (pues la edad va a estar antes)
-    if j != "":
-        for x in range(j):
-            doc = nlp(f[x]) #Procesar el texto con spaCy
-            # Extraer todas las palabras relacionadas con edad que sean sustantivos o adjetivos
-            edad = [f"{doc[i-1].text}" for i, token in enumerate(doc) if token.pos_ in ['NOUN', 'ADJ'] and ('años' in token.text)]
-    else:
-        print("No hay antecedentes")
-    if edad == []:
-        edad.append(0)
-    Goldman.edad = edad
-    Detsky.edad = edad
-    Padua.edad = edad
-
-    age = int(edad[0])
-    if age != 0: #Validar se que encontro la edad
-        if age > 70:
-            Goldman.edad_p = 5 #Si el paciente tiene mas de 70 años se le agregan 5 puntos (1 en Padua)
-            Detsky.edad_p = 5
-            Padua.edad_p = 1
-        else:
-            Goldman.edad_p = 0 #Si el paciente tiene 70 años o menos no se le agregan puntos
-            Detsky.edad_p = 0
-            Padua.edad_p = 0
-    return 0
-
-#Determinar si ha habido infarto agudo de miocardio
-def Find_IAM(f, Goldman, Detsky):
-    terms = ["infarto agudo miocardio", " im ", " ima ", " iam ", "infarto cardiaco", "ataque cardiaco", "ataque corazón", "infarto miocardio", "infarto miocardico", "síndrome isquémico coronario agudo", "sica"]
-    text = Find_Syn(terms,f)
-    print(text.Term)
-    if text.Term != 0: #Determinar si se encontró una coincidencia
-        Goldman.IAM = text.Term
-        Detsky.IAM = text.Term
-        time = Find_Time(f,text)
-        if time != 0:
-            i = time.split()
-            match i[1]:
-                case "meses":
-                    if int(i[0]) <=6:
-                        Goldman.IAM_p = 10
-                        Detsky.IAM_p = 10
-                case "semanas":
-                    if int(i[0]) <=24:
-                        Goldman.IAM_p = 10
-                        Detsky.IAM_p = 10
-                case "dias":
-                    if int(i[0]) <=183:
-                        Goldman.IAM_p = 10
-                        Detsky.IAM_p = 10
-                case _:
-                    Detsky.IAM_p = 5
-        else:
-            Detsky.IAM_p = 0
-            Goldman.IAM_p = 0
-    return 0
-
-#Determinar si hay distensión de la vena yugular
-def Find_JVD(f, Goldman):
-    terms = ["pletora yugular", "ingurgitacion yugular", " JVD ", "distension vena yugular", "distension yugular", "pletora vena yugular", "ingurgitacion vena yugular"]
-    text = Find_Syn(terms,f)
-    print(text.Term)
-    if text.Term != 0: #Determinar si se encontró una coincidencia
-        Goldman.JVD = text.Term
-        Goldman.JVD_p = 11
-    return 0
-
-#Determinar si hay algun criterio no encontrado
-def FindEmpty(Goldman, Lee, Detsky, Padua):
-    G_class = ["edad_p", "IAM_p", "JVD_p", "EA_p", "ECG_p", "CVP_p", "estado_p", "OR_p"]
-    L_class = ["OR_p", "isq_p", "cong_p", "CV_p", "diab_p", "Cr_p"]
-    D_class = ["IAM_p", "ang_p", "angina_p", "edema_p", "EA_p", "ECG_p", "CAP_p", "estado_p", "edad_p", "ER_p"]
-    P_class = ["cancer_p", "TEV_p", "mov_p", "trombo_p", "OR_p", "edad_p", "falla_p", "IAM_p", "BMI_p", "TH_p"]
-    n = 0
-
-    #Validar si existe un atributo vacio
-    for x in range(8):
-        if getattr(Goldman,G_class[x]) == -1:
-            n = n+1
-            Goldman.is_empty = 1
-    for x in range(6):
-        if getattr(Lee,L_class[x]) == -1:
-            n = n+1
-            Lee.is_empty = 1
-    for x in range(10):
-        if getattr(Detsky,D_class[x]) == -1:
-            n = n+1
-            Detsky.is_empty = 1
-    for x in range(10):
-        if getattr(Padua,P_class[x]) == -1:
-            n = n+1
-            Padua.is_empty = 1
-    if n != 0:
-        return 1 #Algun campo se encuentra vacio
-    else:
-        return 0 #Ningun campo esta vacio
 # _.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.__.~"~._.~"~._.~"~._.~"~.
 # CONSTRUCTOR DE FLASH
 
@@ -341,7 +163,7 @@ def index():
         file_ext = os.path.splitext(filename)[1]
         #agregar validación de si no hay archivo
         if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
-                file_ext != validate_file(uploaded_file):
+                file_ext != fx.validate_file(uploaded_file):
             print("Error controlado")
             abort(400)
         basedir = os.path.abspath(os.path.dirname(__file__)) #Obtener el directorio actual
@@ -354,11 +176,11 @@ def indices(name):
     Lee = Puntaje_Lee()
     Detsky = Detsky_Index()
     Padua = Puntaje_Padua()
-    f = Read_File(name) #Leer los contenidos del archivo
-    Find_Edad(f,Goldman, Detsky, Padua)
-    Find_IAM(f, Goldman, Detsky)
-    Find_JVD(f, Goldman)
-    empty = FindEmpty(Goldman, Lee, Detsky, Padua) #Determinar si hay atributos vacios
+    f = fx.Read_File(name) #Leer los contenidos del archivo
+    fx.Find_Edad(f,Goldman, Detsky, Padua)
+    fx.Find_IAM(f, Goldman, Detsky)
+    fx.Find_JVD(f, Goldman)
+    empty = fx.FindEmpty(Goldman, Lee, Detsky, Padua) #Determinar si hay atributos vacios
     if empty == 1:
         return render_template('validar.html',Goldman=Goldman, Detsky=Detsky, Lee=Lee, Padua=Padua) #Si hay atributos vacios, redirigir a un form que pide los datos faltantes
     else:
